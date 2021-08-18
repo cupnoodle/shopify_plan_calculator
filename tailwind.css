@@ -599,6 +599,14 @@ select {
           color-adjust: exact;
 }
 
+.relative {
+  position: relative;
+}
+
+.-top-2 {
+  top: -0.5rem;
+}
+
 .mx-auto {
   margin-left: auto;
   margin-right: auto;
@@ -621,8 +629,16 @@ select {
   margin-top: 2rem;
 }
 
+.mr-0 {
+  margin-right: 0px;
+}
+
 .block {
   display: block;
+}
+
+.inline {
+  display: inline;
 }
 
 .flex {
@@ -631,6 +647,14 @@ select {
 
 .table {
   display: table;
+}
+
+.h-auto {
+  height: auto;
+}
+
+.w-12 {
+  width: 3rem;
 }
 
 .w-1\/6 {
@@ -647,6 +671,17 @@ select {
 
 .max-w-prose {
   max-width: 65ch;
+}
+
+.transform {
+  --tw-translate-x: 0;
+  --tw-translate-y: 0;
+  --tw-rotate: 0;
+  --tw-skew-x: 0;
+  --tw-skew-y: 0;
+  --tw-scale-x: 1;
+  --tw-scale-y: 1;
+  transform: translateX(var(--tw-translate-x)) translateY(var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
 @-webkit-keyframes spin {
@@ -877,6 +912,11 @@ select {
   color: rgba(16, 185, 129, var(--tw-text-opacity));
 }
 
+.hover\:text-green-600:hover {
+  --tw-text-opacity: 1;
+  color: rgba(5, 150, 105, var(--tw-text-opacity));
+}
+
 .underline {
   text-decoration: underline;
 }
@@ -942,6 +982,9 @@ select {
 }
 
 @media (min-width: 1024px) {
+  .lg\:mr-4 {
+    margin-right: 1rem;
+  }
 }
 
 @media (min-width: 1280px) {
