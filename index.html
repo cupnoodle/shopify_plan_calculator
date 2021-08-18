@@ -5,14 +5,137 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Shopify Plan Calculator</title>
-  <style>body { font-size: 16px; }</style>
+  <style>
+    body { font-size: 16px; }
+
+    .slider {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 10px;
+      border-radius: 5px;   
+      background: #d3d3d3;
+      outline: none;
+      -webkit-transition: .2s;
+      transition: opacity .2s;
+    }
+
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 25px;
+      height: 25px;
+      border-radius: 50%; 
+      border: 1px solid #038052;
+      background-color: #47AA04;
+      cursor: pointer;
+      --tw-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+      box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+    }
+
+    .slider::-moz-range-thumb {
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      border: 1px solid #038052;
+      background-color: #47AA04;
+      cursor: pointer;
+      --tw-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+      box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+    }
+  </style>
   <link href="tailwind.css" rel="stylesheet">
+  <script src="https://unpkg.com/alpinejs" defer></script>
 </head>
-<body class="bg-gray-50">
-  <div class="mx-auto max-w-prose mt-4 p-2 bg-white shadow">
+<body class="bg-gray-100">
+  <div class="mx-auto max-w-prose mt-4 py-6 px-6 bg-white shadow" x-data="calculator()">
     <h2 class="text-center text-4xl font-semibold text-gray-700">Shopify Plan Calculator</h2>
     <br>
     <p>Are you paying extra money on transaction fees to Shopify? Would you save more money if you have switched to a higher Shopify plan?</p>
+
+    <br>
+    <div>
+      <label for="revenue" class="block text-sm font-medium text-gray-700">Annual Revenue ($)</label>
+      <div class="mt-1">
+        <input type="number" name="revenue" id="revenue" class="shadow-sm focus:ring-green-500 focus:border-green-500 block w-full sm:text-sm border-gray-300 rounded-md" placeholder="12000" aria-describedby="annual revenue of your store" onkeypress='return event.charCode >= 48 && event.charCode <= 57' @keyup="calculateCost()" x-model="revenue" x-ref="revenue">
+      </div>
+      <p class="mt-2 text-sm text-gray-500">Annual revenue of your store (in USD $)</p>
+    </div>
+    <br><br>
+    <div class="slidecontainer w-full text-center">
+      <label for="percentage" class="block text-sm font-medium text-gray-700">Percentage of revenue processed by Shopify Payment Gateway / third party gateway</label>
+      <br>
+      <div class="flex">
+        <div class="w-1/6 pr-2">
+          <p class="text-3xl font-bold" x-text="payPercentage + '%'">80%</p>
+          <p class="text-sm">of revenue processed by Shopify</p>
+        </div>
+        <input type="range" min="0" max="100" step="1" value="80" class="slider w-4/6" id="percentage" x-model="payPercentage" x-ref="percentage" @change="calculateCost()">
+        <div class="w-1/6 pl-2">
+          <p class="text-3xl font-bold" x-text="100 - payPercentage + '%'">20%</p>
+          <p class="text-sm">of revenue processed by Third party payment gateway</p>
+        </div>
+      </div>
+    </div>
+    <br><br>
+    <label class="block text-sm font-medium text-gray-700">Result</label>
+    <p>The cheapest plan for your store is <span class="font-bold" x-text="plans[cheapestPlanIndex]"></span>.</p>
+    <br><br>
   </div>
+
+  <script>
+    function calculator() {
+      return {
+        payPercentage: 80,
+        revenue: 0,
+        costs: [0,0,0,0],
+        plans: ['Basic Shopify', 'Shopify', 'Advanced Shopify', 'Shopify Plus'],
+        cheapestPlanIndex: 0,
+        calculateCost() {
+          let revenue = parseInt(document.querySelector('#revenue').value);
+          let percentage = parseInt(document.querySelector('#percentage').value);
+          if(revenue == 0 || revenue === NaN){ return; }
+
+          let plans = [
+            { fee: 0.029, other_fee: 0.02, price: 29 },
+            { fee: 0.026, other_fee: 0.01 , price: 79 },
+            { fee: 0.024, other_fee: 0.005 , price: 299 },
+            { fee: 0.0215, other_fee: 0.0015 , price: 2000 }
+          ];
+
+          var c = this.costs;
+          plans.forEach(function (plan, index) {
+            var cost = (12 * plan.price) + (percentage * 0.01 * plan.fee * revenue) + ((100 - percentage) * 0.01 * plan.other_fee * revenue);
+            c[index] = parseInt(cost);
+          });
+
+          this.cheapestPlanIndex = this.indexOfMin(this.costs);
+        },
+        indexOfMin(arr) {
+          if (arr.length === 0) {
+            return -1;
+          }
+
+          var min = arr[0];
+          var minIndex = 0;
+
+          for (var i = 1; i < arr.length; i++) {
+            if (arr[i] < min) {
+              minIndex = i;
+              min = arr[i];
+            }
+          }
+
+          return minIndex;
+        },
+        isNumberKey(evt){
+          var charCode = (evt.which) ? evt.which : evt.keyCode
+          if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+            return false;
+          }
+          return true;
+        }
+      }
+    }
+  </script>
 </body>
 </html>
